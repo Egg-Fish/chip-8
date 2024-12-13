@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 #define C8_STACK_LEN       24
-#define C8_FRAMEBUFFER_LEN 16 * 32
+#define C8_FRAMEBUFFER_LEN 8 * 32
 
 struct c8_machine {
     struct {
@@ -24,8 +24,8 @@ struct c8_machine {
         uint8_t ST;
     } timers;
 
-    uint8_t framebuffer[C8_FRAMEBUFFER_LEN];  // 1 row = 16 bytes
-    bool dxyn_called;
+    uint8_t framebuffer[C8_FRAMEBUFFER_LEN];  // 1 row = 8 bytes
+    bool    dxyn_called;
 
     uint8_t keypad;
 };
@@ -157,18 +157,16 @@ void c8_handle_input(c8_machine_t machine) {}
 void c8_update_timers(c8_machine_t machine) {}
 
 void c8_draw(c8_machine_t machine) {
-    printf("\033[H"); // Move to (0, 0)
+    printf("\033[H");  // Move to (0, 0)
 
     for (int i = 0; i < 32; i++) {
-        for (int j = 0; j < 16; j++) {
-
-            uint8_t framebuffer_byte = machine->framebuffer[i * 16 + j];
+        for (int j = 0; j < 8; j++) {
+            uint8_t framebuffer_byte = machine->framebuffer[i * 8 + j];
 
             for (int k = 7; k >= 0; k--) {
                 if ((framebuffer_byte >> k) & 1) {
-                    printf("##");
-                }
-                else {
+                    printf("\u2588\u2588");
+                } else {
                     printf("  ");
                 }
             }
