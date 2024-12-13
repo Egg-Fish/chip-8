@@ -25,6 +25,7 @@ struct c8_machine {
     } timers;
 
     uint8_t framebuffer[C8_FRAMEBUFFER_LEN];  // 1 row = 16 bytes
+    bool dxyn_called;
 
     uint8_t keypad;
 };
@@ -102,6 +103,7 @@ void c8_cycle(c8_machine_t machine) {
         case 0xB:
         case 0xC:
         case 0xD: {
+            machine->dxyn_called = true;
             uint8_t pixels[16];  // Max N = 0xF
 
             uint8_t *addr = &machine->memory[machine->registers.I];  // Starting address
@@ -187,7 +189,11 @@ int main(void) {
         c8_handle_input(machine);
         c8_update_timers(machine);
         c8_cycle(machine);
-        c8_draw(machine);
+
+        if (machine->dxyn_called) {
+            c8_draw(machine);
+            machine->dxyn_called = false;
+        }
     }
 
     return 0;
