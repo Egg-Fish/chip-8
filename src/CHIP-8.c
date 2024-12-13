@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define C8_STACK_LEN       24
 #define C8_FRAMEBUFFER_LEN 16 * 32
@@ -30,7 +31,7 @@ struct c8_machine {
 
 typedef struct c8_machine *c8_machine_t;
 
-int c8_display_pixel_draw(c8_machine_t machine, uint8_t pixel_x, uint8_t pixel_y, uint8_t draw_value) {
+bool c8_display_pixel_draw(c8_machine_t machine, uint8_t pixel_x, uint8_t pixel_y, uint8_t draw_value) {
     int framebuffer_x = pixel_x / 8;
     int framebuffer_y = pixel_y;
 
