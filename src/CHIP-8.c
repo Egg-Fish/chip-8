@@ -2,6 +2,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define C8_STACK_LEN 24
+#define C8_FRAMEBUFFER_LEN 16 * 32
 
 struct c8_machine {
     struct {
@@ -27,14 +31,14 @@ struct c8_machine {
     } registers;
 
     uint8_t  memory[4096];
-    uint16_t stack[24];
+    uint16_t stack[C8_STACK_LEN];
 
     struct {
         uint8_t DT;
         uint8_t ST;
     } timers;
 
-    uint8_t framebuffer[16 * 32]; // 1 row = 16 bytes
+    uint8_t framebuffer[C8_FRAMEBUFFER_LEN];  // 1 row = 16 bytes
 
     uint8_t keypad;
 };
