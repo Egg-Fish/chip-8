@@ -1,9 +1,9 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 #define C8_STACK_LEN       24
 #define C8_FRAMEBUFFER_LEN 8 * 32
@@ -31,27 +31,6 @@ struct c8_machine {
 };
 
 typedef struct c8_machine *c8_machine_t;
-
-bool c8_display_pixel_draw(c8_machine_t machine, uint8_t pixel_x, uint8_t pixel_y, uint8_t draw_value) {
-    int framebuffer_x = pixel_x / 8;
-    int framebuffer_y = pixel_y;
-
-    int framebuffer_index = framebuffer_y * 16 + framebuffer_x;
-
-    // Fetch framebuffer byte associated to pixel at (pixel_x, pixel_y)
-    uint8_t framebuffer_byte = machine->framebuffer[framebuffer_index];
-
-    // Within the framebuffer byte, select the bit that represents the pixel
-    int framebuffer_byte_x = pixel_x % 8;
-
-    // Highest bit is closest to the left side of the screen.
-    uint8_t framebuffer_byte_new = framebuffer_byte ^ (draw_value << (7 - framebuffer_byte_x));
-
-    machine->framebuffer[framebuffer_index] = framebuffer_byte_new;
-
-    // If a 1 is flipped to a 0, then the number will be smaller.
-    return framebuffer_byte_new < framebuffer_byte;
-}
 
 void c8_cycle(c8_machine_t machine) {
     // Fetch
@@ -115,17 +94,29 @@ void c8_cycle(c8_machine_t machine) {
             uint8_t pixel_x = machine->registers.V[X];
             uint8_t pixel_y = machine->registers.V[Y];
 
-            int has_flipped = 0;
-            for (uint8_t i = 0; i < N; i++) {
+            // Offset from the framebuffer byte containing the pixel
+            uint8_t pixel_offset = pixel_x % 8;
+
+            uint8_t is_collision = 0;
+
+            for (int i = 0; i < N; i++) {
                 uint8_t pixel = pixels[i];
-                for (uint8_t j = 0; j < 8; j++) {
-                    has_flipped |= c8_display_pixel_draw(
-                        machine,
-                        pixel_x + j,
-                        pixel_y + i,
-                        (pixel >> (7 - j)) & 1);
-                }
+
+                uint8_t value_low  = (pixel >> pixel_offset) & 0xFF;
+                uint8_t value_high = (pixel << (8 - pixel_offset)) & 0xFF;
+
+                int index_low  = (pixel_y % 32) * 8 + (pixel_x % 64) / 8;
+                int index_high = (pixel_y % 32) * 8 + ((pixel_x + 8) % 64) / 8;
+
+                is_collision |= machine->framebuffer[index_low] & value_low;
+                is_collision |= machine->framebuffer[index_high] & value_high;
+
+                machine->framebuffer[index_low] ^= value_low;
+                machine->framebuffer[index_high] ^= value_high;
+
+                pixel_y++;
             }
+
         } break;
         case 0xE:
         case 0xF:
