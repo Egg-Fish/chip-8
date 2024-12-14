@@ -224,6 +224,19 @@ void c8_cycle(c8_machine_t machine) {
 
             break;
         case 0xF:
+            if (NN == 0x07) {
+                machine->registers.V[X] = machine->timers.DT;
+            }
+
+            if (NN == 0x15) {
+                machine->timers.DT = machine->registers.V[X];
+            }
+
+            if (NN == 0x18) {
+                machine->timers.ST = machine->registers.V[X];
+            }
+
+            break;
         default:
             break;
     }
