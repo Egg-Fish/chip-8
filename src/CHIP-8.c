@@ -163,7 +163,13 @@ void c8_cycle(c8_machine_t machine) {
 
             break;
         case 0xB:
+            machine->registers.PC = NNN + machine->registers.V[0];
+
+            break;
         case 0xC:
+            machine->registers.V[X] = rand() & NN;
+
+            break;
         case 0xD: {
             machine->dxyn_called = true;
             uint8_t pixels[16];  // Max N = 0xF
