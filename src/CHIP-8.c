@@ -68,6 +68,10 @@ void c8_cycle(c8_machine_t machine) {
 
             break;
         case 0x2:
+            machine->stack[++machine->stack_top] = machine->registers.PC;
+            machine->registers.PC = NNN;
+            
+            break;
         case 0x3:
         case 0x4:
         case 0x5:
