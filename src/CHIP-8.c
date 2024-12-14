@@ -17,7 +17,9 @@ struct c8_machine {
     } registers;
 
     uint8_t  memory[4096];
+
     uint16_t stack[C8_STACK_LEN];
+    int stack_top;
 
     struct {
         uint8_t DT;
@@ -54,6 +56,10 @@ void c8_cycle(c8_machine_t machine) {
         case 0x0:
             if (instruction == 0x00E0) {
                 memset(machine->framebuffer, 0, C8_FRAMEBUFFER_LEN);
+            }
+
+            if (instruction == 0x00EE) {
+                machine->registers.PC = machine->stack[machine->stack_top--];
             }
 
             break;
@@ -142,6 +148,8 @@ void c8_init(c8_machine_t machine) {
         0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xE0, 0x00, 0xE0};
 
     memcpy(&machine->memory[0x0200], ibm_logo_rom, sizeof(ibm_logo_rom));
+
+    machine->stack_top = -1;
 }
 
 void c8_handle_input(c8_machine_t machine) {}
