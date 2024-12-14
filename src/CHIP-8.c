@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 #define C8_STACK_LEN       24
 #define C8_FRAMEBUFFER_LEN 8 * 32
@@ -324,7 +325,18 @@ void c8_handle_input(c8_machine_t machine) {
     }
 }
 
-void c8_update_timers(c8_machine_t machine) {}
+void c8_update_timers(c8_machine_t machine, unsigned int dt_milliseconds) {
+    static unsigned int t = 0;
+
+    t += dt_milliseconds;
+
+    if (t < 16) return;
+
+    machine->timers.DT -= machine->timers.DT == 0 ? 0 : t / 16;
+    machine->timers.ST -= machine->timers.ST == 0 ? 0 : t / 16;
+
+    t = 0;
+}
 
 void c8_draw(c8_machine_t machine) {
     printf("\033[H");  // Move to (0, 0)
@@ -353,15 +365,20 @@ int main(void) {
 
     c8_init(machine);
 
-    while (1) {
+    while (true) {
+        unsigned int time_start = timeGetTime();
+
         c8_handle_input(machine);
-        c8_update_timers(machine);
         c8_cycle(machine);
 
         if (machine->dxyn_called) {
             c8_draw(machine);
             machine->dxyn_called = false;
         }
+
+        unsigned int time_end = timeGetTime();
+
+        c8_update_timers(machine, time_end - time_start);
     }
 
     return 0;
