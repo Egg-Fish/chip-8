@@ -224,16 +224,42 @@ void c8_cycle(c8_machine_t machine) {
 
             break;
         case 0xF:
-            if (NN == 0x07) {
-                machine->registers.V[X] = machine->timers.DT;
-            }
+            switch (NN) {
+                case 0x07:
+                    machine->registers.V[X] = machine->timers.DT;
 
-            if (NN == 0x15) {
-                machine->timers.DT = machine->registers.V[X];
-            }
+                    break;
 
-            if (NN == 0x18) {
-                machine->timers.ST = machine->registers.V[X];
+                case 0x15:
+                    machine->timers.DT = machine->registers.V[X];
+
+                    break;
+
+                case 0x18:
+                    machine->timers.ST = machine->registers.V[X];
+
+                    break;
+
+                case 0x1E:
+                    machine->registers.I += machine->registers.V[X];
+                    machine->registers.V[0xF] = machine->registers.I > 0x0FFF;
+
+                    break;
+
+                case 0x0A:
+                    if (machine->keypad == 0x69) {
+                        machine->registers.PC -= 2;
+                    }
+
+                    else {
+                        machine->registers.V[X] = machine->keypad;
+                    }
+
+                    break;
+
+                default:
+                    // Handle any other values of NN if necessary
+                    break;
             }
 
             break;
