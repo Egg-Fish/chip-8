@@ -99,6 +99,59 @@ void c8_cycle(c8_machine_t machine) {
 
             break;
         case 0x8:
+            switch (N) {
+                case 0x0:
+                    machine->registers.V[X] = machine->registers.V[Y];
+
+                    break;
+                case 0x1:
+                    machine->registers.V[X] |= machine->registers.V[Y];
+
+                    break;
+                case 0x2:
+                    machine->registers.V[X] &= machine->registers.V[Y];
+
+                    break;
+                case 0x3:
+                    machine->registers.V[X] ^= machine->registers.V[Y];
+
+                    break;
+                case 0x4: {
+                    uint8_t VX = machine->registers.V[X];
+                    machine->registers.V[X] += machine->registers.V[Y];
+
+                    machine->registers.V[0xF] = machine->registers.V[X] <= VX;
+                } break;
+                case 0x5: {
+                    uint8_t VX = machine->registers.V[X];
+                    machine->registers.V[X] -= machine->registers.V[Y];
+
+                    machine->registers.V[0xF] = machine->registers.V[X] <= VX;
+                } break;
+                case 0x6:
+                    machine->registers.V[0xF] = machine->registers.V[X] & 0x1;
+                    machine->registers.V[X]   = machine->registers.V[X] >> 1;
+
+                    break;
+                case 0x7: {
+                    uint8_t VX = machine->registers.V[X];
+                    uint8_t VY = machine->registers.V[Y];
+
+                    machine->registers.V[X] = VY - VX;
+
+                    machine->registers.V[0xF] = VX <= VY;
+
+                } break;
+                case 0xE:
+                    machine->registers.V[0xF] = (machine->registers.V[X] >> 7) & 0x1;
+                    machine->registers.V[X]   = machine->registers.V[X] << 1;
+
+                    break;
+                default:
+                    break;
+            }
+
+            break;
         case 0x9:
             if (machine->registers.V[X] != machine->registers.V[Y]) {
                 machine->registers.PC += 2;
