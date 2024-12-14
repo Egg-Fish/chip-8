@@ -7,3 +7,8 @@ add_executable(
     CHIP-8
     src/CHIP-8.c
 )
+
+target_link_libraries(
+    CHIP-8 PRIVATE
+    winmm
+)
