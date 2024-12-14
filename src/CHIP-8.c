@@ -1,3 +1,4 @@
+#include <conio.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -208,6 +209,19 @@ void c8_cycle(c8_machine_t machine) {
 
         } break;
         case 0xE:
+            if (NN == 0x9E) {
+                if (machine->keypad == machine->registers.V[X]) {
+                    machine->registers.PC += 2;
+                }
+            }
+
+            if (NN == 0xA1) {
+                if (machine->keypad != machine->registers.V[X]) {
+                    machine->registers.PC += 2;
+                }
+            }
+
+            break;
         case 0xF:
         default:
             break;
@@ -235,7 +249,81 @@ void c8_init(c8_machine_t machine) {
     machine->stack_top = -1;
 }
 
-void c8_handle_input(c8_machine_t machine) {}
+void c8_handle_input(c8_machine_t machine) {
+    if (!_kbhit()) {
+        machine->keypad = 0x69;
+        return;
+    }
+
+    char c = _getch();
+
+    switch (c) {
+        case '1':
+            machine->keypad = 0x1;
+            break;
+        case '2':
+            machine->keypad = 0x2;
+            break;
+        case '3':
+            machine->keypad = 0x3;
+            break;
+        case '4':
+            machine->keypad = 0xC;
+            break;
+        case 'Q':
+        case 'q':
+            machine->keypad = 0x4;
+            break;
+        case 'W':
+        case 'w':
+            machine->keypad = 0x5;
+            break;
+        case 'E':
+        case 'e':
+            machine->keypad = 0x6;
+            break;
+        case 'R':
+        case 'r':
+            machine->keypad = 0xD;
+            break;
+        case 'A':
+        case 'a':
+            machine->keypad = 0x7;
+            break;
+        case 'S':
+        case 's':
+            machine->keypad = 0x8;
+            break;
+        case 'D':
+        case 'd':
+            machine->keypad = 0x9;
+            break;
+        case 'F':
+        case 'f':
+            machine->keypad = 0xE;
+            break;
+        case 'Z':
+        case 'z':
+            machine->keypad = 0xA;
+            break;
+        case 'X':
+        case 'x':
+            machine->keypad = 0x0;
+            break;
+        case 'C':
+        case 'c':
+            machine->keypad = 0xB;
+            break;
+        case 'V':
+        case 'v':
+            machine->keypad = 0xF;
+            break;
+        default:
+            machine->keypad = 0x69;
+            break;  // No key pressed or invalid key
+    }
+}
+
 void c8_update_timers(c8_machine_t machine) {}
 
 void c8_draw(c8_machine_t machine) {
