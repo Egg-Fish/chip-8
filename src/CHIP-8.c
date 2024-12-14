@@ -16,10 +16,10 @@ struct c8_machine {
         uint16_t PC;
     } registers;
 
-    uint8_t  memory[4096];
+    uint8_t memory[4096];
 
     uint16_t stack[C8_STACK_LEN];
-    int stack_top;
+    int      stack_top;
 
     struct {
         uint8_t DT;
@@ -69,12 +69,27 @@ void c8_cycle(c8_machine_t machine) {
             break;
         case 0x2:
             machine->stack[++machine->stack_top] = machine->registers.PC;
-            machine->registers.PC = NNN;
-            
+            machine->registers.PC                = NNN;
+
             break;
         case 0x3:
+            if (machine->registers.V[X] == NN) {
+                machine->registers.PC += 2;
+            }
+
+            break;
         case 0x4:
+            if (machine->registers.V[X] != NN) {
+                machine->registers.PC += 2;
+            }
+
+            break;
         case 0x5:
+            if (machine->registers.V[X] == machine->registers.V[Y]) {
+                machine->registers.PC += 2;
+            }
+
+            break;
         case 0x6:
             machine->registers.V[X] = NN;
 
@@ -85,6 +100,11 @@ void c8_cycle(c8_machine_t machine) {
             break;
         case 0x8:
         case 0x9:
+            if (machine->registers.V[X] != machine->registers.V[Y]) {
+                machine->registers.PC += 2;
+            }
+
+            break;
         case 0xA:
             machine->registers.I = NNN;
 
