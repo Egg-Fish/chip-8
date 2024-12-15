@@ -262,6 +262,13 @@ void c8_cycle(c8_machine_t machine) {
 
                     break;
 
+                case 0x33:
+                    machine->memory[machine->registers.I]     = machine->registers.V[X] / 100;
+                    machine->memory[machine->registers.I + 1] = (machine->registers.V[X] / 10) % 10;
+                    machine->memory[machine->registers.I + 2] = machine->registers.V[X] % 10;
+
+                    break;
+
                 default:
                     // Handle any other values of NN if necessary
                     break;
