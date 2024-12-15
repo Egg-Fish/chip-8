@@ -269,6 +269,20 @@ void c8_cycle(c8_machine_t machine) {
 
                     break;
 
+                case 0x55:
+                    for (int i = machine->registers.V[X]; i >= 0; i--) {
+                        machine->memory[machine->registers.I + i] = machine->registers.V[i];
+                    }
+
+                    break;
+
+                case 0x65:
+                    for (int i = machine->registers.V[X]; i >= 0; i--) {
+                        machine->registers.V[i] = machine->memory[machine->registers.I + i];
+                    }
+
+                    break;
+
                 default:
                     // Handle any other values of NN if necessary
                     break;
