@@ -11,6 +11,8 @@
 #define C8_FRAMEBUFFER_LEN 8 * 32
 
 struct c8_machine {
+    bool running;
+
     struct {
         uint8_t V[16];
 
@@ -294,8 +296,10 @@ void c8_cycle(c8_machine_t machine) {
     }
 }
 
-void c8_init(c8_machine_t machine) {
+void c8_init(c8_machine_t machine, const char *path_to_rom) {
+    machine->running      = true;
     machine->registers.PC = 0x0200;
+    machine->stack_top    = -1;
 
     const uint8_t font_data[] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0,  // 0
@@ -405,6 +409,9 @@ void c8_handle_input(c8_machine_t machine) {
         case 'v':
             machine->keypad = 0xF;
             break;
+        case 27:
+            machine->running = false;
+            break;
         default:
             machine->keypad = 0x69;
             break;  // No key pressed or invalid key
@@ -451,7 +458,7 @@ int main(void) {
 
     c8_init(machine);
 
-    while (true) {
+    while (machine->running) {
         unsigned int time_start = timeGetTime();
 
         c8_handle_input(machine);
