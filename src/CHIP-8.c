@@ -260,7 +260,7 @@ void c8_cycle(c8_machine_t machine) {
                     break;
 
                 case 0x29:
-                    machine->registers.I = 0x0050 + (machine->registers.V[X] & 0xF);
+                    machine->registers.I = 0x0050 + (machine->registers.V[X] & 0xF) * 5;
 
                     break;
 
@@ -272,14 +272,14 @@ void c8_cycle(c8_machine_t machine) {
                     break;
 
                 case 0x55:
-                    for (int i = machine->registers.V[X]; i >= 0; i--) {
+                    for (int i = 0; i <= X; i++) {
                         machine->memory[machine->registers.I + i] = machine->registers.V[i];
                     }
 
                     break;
 
                 case 0x65:
-                    for (int i = machine->registers.V[X]; i >= 0; i--) {
+                    for (int i = 0; i <= X; i++) {
                         machine->registers.V[i] = machine->memory[machine->registers.I + i];
                     }
 
@@ -454,10 +454,12 @@ int main(int argc, const char *argv[]) {
     }
 
     printf("\033[=13h");
+    printf("\033[2J");
+    printf("\033[?25l");
 
     c8_machine_t machine = calloc(1, sizeof(struct c8_machine));
 
-    c8_init(machine);
+    c8_init(machine, argv[1]);
 
     while (machine->running) {
         unsigned int time_start = timeGetTime();
@@ -474,6 +476,8 @@ int main(int argc, const char *argv[]) {
 
         c8_update_timers(machine, time_end - time_start);
     }
+
+    printf("\033[?25h");
 
     return 0;
 }
